@@ -1,6 +1,6 @@
 <template>
     <div class="section-brand">
-        <Form :model="filterOptions" :label-width="80" class="section-form">
+        <Form :model="filterOptions" :label-width="80" class="section-form" ref="searchForm">
             <Row :gutter="16">
                 <Col span="6" :lg="6" :sm="12" :xs="24">                
                     <Form-item label="品牌名称">
@@ -35,8 +35,8 @@
             <Row :gutter="16">
                 <Col span="24" class="form-actions">
                     <Form-item>
-                       <Button type="primary" icon="search" @click="loadData">查&nbsp;&nbsp;询</Button>
-                       <Button type="ghost" icon="refresh">重&nbsp;&nbsp;置</Button>
+                       <Button type="primary" icon="search" @click="load">查&nbsp;&nbsp;询</Button>
+                       <Button type="ghost" icon="refresh" @click="handleReset">重&nbsp;&nbsp;置</Button>
                    </Form-item>
                 </Col>
             </Row>
@@ -44,17 +44,20 @@
         <div class="split-line"></div>        
         <div class="section-data">
             <div class="section-data-actions">
-                <Button type="ghost" icon="plus-round" @click="brandAdd">添加品牌</Button>
-                <Button type="ghost" icon="trash-a">删除品牌</Button>
+                <Button type="ghost" icon="plus-round" @click="add">添加品牌</Button>
+                <Button type="ghost" icon="trash-a" :loading="action.deleting" @click="del">
+                    <span v-if="!action.deleting">删除</span>
+                    <span v-else>删除中...</span>
+                </Button>
             </div>
             <div class="section-data-table">
-                <Table :columns="dataColumns" :data="dataList" size="small" ref="dataTable"></Table>
+                <Table :columns="dataColumns" :data="dataList" size="small" ref="dataTable" stripe @on-selection-change="dataSelect"></Table>
             </div>
             <div class="section-data-page">
                <div><Page :total="dataCount" :current="dataPage" :pageSize="15" show-total></Page></div>
             </div>
         </div>
-        <Modal v-model="showModal" :title="modalTitle" :width="modalWidth" :mask-closable="false" border @on-ok="brandSave">
+        <Modal v-model="showModal" :title="modalTitle" :width="modalWidth" :mask-closable="false" border @on-ok="save">
             <Brand-Form ref="dataForm"></Brand-Form>
         </Modal>
     </div>
@@ -92,14 +95,17 @@ export default {
             }, {
                 title: '是否热门',
                 key: 'hot',
+                align: 'center',
                 width: 140
             }, {
                 title: '是否隐藏',
                 key: 'hidden',
+                align: 'center',
                 width: 140
             }, {
                 title: '是否删除',
                 key: 'deleted',
+                align: 'center',
                 width: 140
             }, {
                 title: '排序',
@@ -108,10 +114,12 @@ export default {
             }, {
                 title: '创建人',
                 key: 'creator',
+                align: 'center',
                 width: 200
             }, {
                 title: '创建时间',
                 key: 'createTime',
+                align: 'center',
                 width: 200
             }],
             filterOptions: {
@@ -119,13 +127,17 @@ export default {
                 hidden: '0',
                 deleted: '0'
             },
+            dataSelected: [],
+            action: {
+                deleting: false
+            },
             showModal: false,
             modalTitle: '添加品牌',
             modalWidth: 900
         };
     },
     methods: {
-        loadData() {
+        load() {
             let params = Object.assign({}, this.filterOptions);
             params.current = this.dataPage;
             brandService.list(params).then(res => {
@@ -136,23 +148,52 @@ export default {
                     this.dataList = data.records;
                 }
             });
+            // console.log(Pinyin.getFullChars('三 一 重 工'));
+            // console.log(Pinyin.getCamelChars('三一重工'));
         },
-        brandAdd() {
+        add() {
             this.showModal = true;
         },
-        brandSave(obj) {
+        save(obj) {
             let params = this.$refs.dataForm.data;
             brandService.save(params).then(res => {
-                console.log(res);
                 if (res.data.code === 1) {
                     let data = res.data.data;
-                    this.loadData();
+                    this.load();
                 }
             });
+        },
+        del() {
+            if (this.dataSelected.length === 0) {
+                this.$Message.warning('请选择至少一条记录');
+                return;
+            }
+            this.action.deleting = true;
+            let params = {
+                id: this.dataSelected.join(',')
+            };
+            brandService.delete(params).then(res => {
+                if (res.data.code === 1) {
+                    this.$Message.success('操作成功');
+                    this.load();
+                } else {
+                    this.$Message.error(res.data.message);
+                }
+                this.action.deleting = false;
+            });
+        },
+        dataSelect(selectedObjs) {
+            this.dataSelected = selectedObjs.map(obj => {
+                return obj.id;
+            });
+        },
+        handleReset () {
+            console.log('reset');
+            this.$refs.searchForm.resetFields();
         }
     },
     created () {
-        this.loadData();
+        this.load();
     }
 };
 </script>

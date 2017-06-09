@@ -13,5 +13,7 @@ export default {
 
     save: (params) => http.post('dict/save', params),
 
+    delete: (params) => http.post('dict/delete', params),
+
     names: () => http.post('dict/names')
 };

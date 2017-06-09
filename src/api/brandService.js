@@ -11,5 +11,7 @@ export default {
      */
     list: (params) => http.post('brand/list', params),
 
-    save: (params) => http.post('brand/save', params)
+    save: (params) => http.post('brand/save', params),
+
+    delete: (params) => http.post('brand/delete', params)
 };

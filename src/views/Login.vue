@@ -10,7 +10,7 @@
                     </Input>
                 </Form-item>
                 <Form-item prop="password" class="item-password">
-                    <Input v-model="formData.password" type="password" placeholder="密码">
+                    <Input v-model="formData.password" type="password" placeholder="密码" @on-enter="toLogin">
                     <Icon type="locked" slot="prepend"></Icon>
                     </Input>
                 </Form-item>

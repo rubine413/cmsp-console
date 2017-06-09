@@ -31,17 +31,20 @@
         <div class="section-data">
             <div class="section-data-actions">
                 <Button type="ghost" icon="plus-round" @click="add">添加</Button>
-                <Button type="ghost" icon="trash-a">删除</Button>
+                <Button type="ghost" icon="trash-a" :loading="action.deleting" @click="del">
+                    <span v-if="!action.deleting">删除</span>
+                    <span v-else>删除中...</span>
+                </Button>
             </div>
             <div class="section-data-table">
-                <Table :columns="dataColumns" :data="dataList" size="small" ref="dataTable"></Table>
+                <Table :columns="dataColumns" :data="dataList" size="small" ref="dataTable" stripe @on-selection-change="dataSelect"></Table>
             </div>
             <div class="section-data-page">
                <div><Page :total="dataCount" :current="dataPage" :pageSize="15" show-total></Page></div>
             </div>
         </div>
         <Modal v-model="showModal" :title="modalTitle" :width="modalWidth" :mask-closable="false" border @on-ok="save">
-            <Dict-Form ref="dataForm"></Dict-Form>
+            <Dict-Form ref="dataForm" :names="dictNames"></Dict-Form>
         </Modal>
     </div>
 </template>
@@ -70,9 +73,11 @@ export default {
                 key: 'dictNameDesc'
             }, {
                 title: '字典键',
+                align: 'center',
                 key: 'dictKey'
             }, {
                 title: '字典值',
+                align: 'center',
                 key: 'dictValue'
             }, {
                 title: '状态',
@@ -93,9 +98,13 @@ export default {
                 align: 'center',
                 width: 200
             }],
+            dataSelected: [],
             filterOptions: {
                 dictName: '',
                 deleted: '0'
+            },
+            action: {
+                deleting: false
             },
             showModal: false,
             modalTitle: '添加字典',
@@ -134,6 +143,31 @@ export default {
                     let data = res.data.data;
                     this.load();
                 }
+            });
+        },
+        del() {
+            if (this.dataSelected.length === 0) {
+                this.$Message.warning('请选择至少一条记录');
+                return;
+            }
+            this.action.deleting = true;
+            let params = {
+                id: this.dataSelected.join(',')
+            };
+            dictService.delete(params).then(res => {
+                if (res.data.code === 1) {
+                    this.$Message.success('操作成功');
+                    this.load();
+                    this.loadNames();
+                } else {
+                    this.$Message.error(res.data.message);
+                }
+                this.action.deleting = false;
+            });
+        },
+        dataSelect(selectedObjs) {
+            this.dataSelected = selectedObjs.map(obj => {
+                return obj.id;
             });
         }
     },
