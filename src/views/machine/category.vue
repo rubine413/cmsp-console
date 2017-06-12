@@ -96,11 +96,11 @@ export default {
                 title: '分类名称',
                 key: 'name',
                 // fixed: 'left',
-                width: 200
+                width: 150
             }, {
                 title: '上级分类',
                 key: 'name',
-                width: 200,
+                width: 150,
                 render: (h, params) => {
                     let parent = this.tops.filter(item => {
                         return item.id === params.row.pid;

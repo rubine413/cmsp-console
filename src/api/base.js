@@ -1,7 +1,7 @@
 import axios from 'axios';
 import qs from 'querystring';
 
-const host = process.env.NODE_ENV !== 'production' ? 'http://127.0.0.1:8081/' : 'http://127.0.0.1:8080/api';
+const host = process.env.NODE_ENV !== 'production' ? 'http://127.0.0.1:9091/' : 'http://127.0.0.1:8080/api';
 
 // 存储当前请求中的地址, 出错或响应后移除, 如果存在重复请求, 则取消原请求
 let requestURLs = {};

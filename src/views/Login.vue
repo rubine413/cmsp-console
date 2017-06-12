@@ -60,7 +60,8 @@ export default {
             }
             this.loading = true;
             // 模拟登陆请求
-            userService.login(data).then(res => {
+            this.$router.push('/basic/form');
+            /* userService.login(data).then(res => {
                 if (res.data.code === 1) {
                     this.loading = false;
                     this.$router.push('/basic/form');
@@ -68,8 +69,7 @@ export default {
                     this.$Message.warning(res.data.message);
                     this.loading = false;
                 }
-                // this.$router.push('/basic/form');
-            });            
+            });   */         
         }
     }
 };
