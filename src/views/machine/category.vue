@@ -180,8 +180,8 @@ export default {
                 }
             });
         },        
-        loadTops() {
-            categoryService.tops().then(res => {
+        loadChosen() {
+            categoryService.chosen(0).then(res => {
                 if (res.data.code === 1) {
                     this.tops = res.data.data;
                 }
@@ -235,7 +235,7 @@ export default {
     },
     created () {
         this.load();
-        this.loadTops();
+        this.loadChosen();
     }
 };
 </script>

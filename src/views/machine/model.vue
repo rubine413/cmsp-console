@@ -9,7 +9,7 @@
                 </Col>
                 <Col span="6" :lg="6" :sm="12" :xs="24">
                     <Form-item label="一级分类">                
-                        <Select v-model="filterOptions.categoryRoot" clearable placeholder="请选择">
+                        <Select v-model="filterOptions.categoryRoot" clearable placeholder="请选择" @on-change="fetchChosen">
                             <Option v-for="item in tops" :value="item.id" :key="item">{{ item.name }}</Option>
                         </Select>
                     </Form-item>
@@ -17,38 +17,38 @@
                 <Col span="6" :lg="6" :sm="12" :xs="24">
                     <Form-item label="二级分类">                
                         <Select v-model="filterOptions.category" clearable placeholder="请选择">
-                            <Option v-for="item in tops" :value="item.id" :key="item">{{ item.name }}</Option>
+                            <Option v-for="item in subs" :value="item.id" :key="item">{{ item.name }}</Option>
                         </Select>
                     </Form-item>
                 </Col>
                 <Col span="6" :lg="6" :sm="12" :xs="24">
                     <Form-item label="品牌">                
                         <Select v-model="filterOptions.brand" clearable placeholder="请选择">
-                            <Option v-for="item in tops" :value="item.id" :key="item">{{ item.name }}</Option>
+                            <Option v-for="item in brands" :value="item.id" :key="item">{{ item.name }}</Option>
                         </Select>
                     </Form-item>
                 </Col>
                 <Col span="6" :lg="6" :sm="12" :xs="24">
                     <Form-item label="是否热门">                
                         <Select v-model="filterOptions.hot" clearable placeholder="请选择">
-                            <Option value="1">热门</Option>
-                            <Option value="0">非热门</Option>
+                            <Option :value="1">热门</Option>
+                            <Option :value="0">非热门</Option>
                         </Select>
                     </Form-item>
                 </Col>
                 <Col span="6" :lg="6" :sm="12" :xs="24">
                     <Form-item label="是否隐藏">
                         <Select v-model="filterOptions.hidden" clearable placeholder="请选择">
-                            <Option value="1">已隐藏</Option>
-                            <Option value="0">未隐藏</Option>
+                            <Option :value="1">已隐藏</Option>
+                            <Option :value="0">未隐藏</Option>
                         </Select>
                     </Form-item>
                 </Col>
                 <Col span="6" :lg="6" :sm="12" :xs="24">
                     <Form-item label="是否已删除">
                         <Select v-model="filterOptions.deleted" clearable placeholder="请选择">
-                            <Option value="1">已删除</Option>
-                            <Option value="0">未删除</Option>
+                            <Option :value="1">已删除</Option>
+                            <Option :value="0">未删除</Option>
                         </Select>
                     </Form-item>
                 </Col>
@@ -78,22 +78,25 @@
                <div><Page :total="dataCount" :current="dataPage" :pageSize="10" show-total @on-change="pageChange"></Page></div>
             </div>
         </div>
-        <Modal v-model="showModal" title="添加分类" :width="modalWidth" :mask-closable="false" border @on-ok="save">
-            <Category-Form ref="dataForm" :tops="tops"></Category-Form>
+        <Modal v-model="showModal" title="添加型号" :width="modalWidth" :mask-closable="false" border @on-ok="save">
+            <Model-Form ref="dataForm"></Model-Form>
         </Modal>
     </div>
 </template>
 
 <script>
 import categoryService from './../../api/categoryService';
+import brandService from './../../api/brandService';
 import modelService from './../../api/modelService';
-import CategoryForm from './categoryForm';
+import ModelForm from './modelForm';
 
 export default {
-    components: { CategoryForm },
+    components: { ModelForm },
     data() {
         return {
             tops: [],
+            subs: [],
+            brands: [],
             dataList: [],
             dataCount: 0,
             dataPage: 1,
@@ -164,8 +167,8 @@ export default {
                 category: 0,
                 brand: 0,
                 hot: '',
-                hidden: '0',
-                deleted: '0',
+                hidden: 0,
+                deleted: 0,
                 pid: 0
             },
             dataSelected: [],
@@ -191,9 +194,14 @@ export default {
             });
         },        
         loadTops() {
-            categoryService.tops().then(res => {
+            categoryService.chosen(0).then(res => {
                 if (res.data.code === 1) {
                     this.tops = res.data.data;
+                }
+            });            
+            brandService.chosen().then(res => {
+                if (res.data.code === 1) {
+                    this.brands = res.data.data;
                 }
             });
         },
@@ -207,6 +215,8 @@ export default {
                 if (res.data.code === 1) {
                     let data = res.data.data;
                     this.load();
+                } else {
+                    this.$Message.warning(res.data.message);
                 }
             });
         },
@@ -241,6 +251,13 @@ export default {
         pageChange(page) {
             this.dataPage = page;
             this.load();
+        },
+        fetchChosen(id) {
+            categoryService.chosen(id).then(res => {
+                if (res.data.code === 1) {
+                    this.subs = res.data.data;
+                }
+            });
         }
     },
     created () {

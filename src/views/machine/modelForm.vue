@@ -3,26 +3,32 @@
         <Form :model="data" :label-width="80" class="section-form">
             <Row :gutter="16">
                 <Col span="8" :lg="8" :xs="12">
-                    <Form-item label="分类名称" required>
-                        <Input v-model="data.name" placeholder="" @on-change="transferPinyin"></Input>
+                    <Form-item label="设备型号" required>
+                        <Input v-model="data.name" placeholder=""></Input>
                     </Form-item>
                 </Col>
                 <Col span="8" :lg="8" :sm="12" :xs="24">
-                    <Form-item label="上级分类" required>
-                        <Select v-model="data.pid" clearable placeholder="请选择">
+                    <Form-item label="一级分类" required>
+                        <Select v-model="data.categoryRootId" clearable placeholder="请选择" @on-change="fetchSubs">
                             <Option :value="0">无</Option>
                             <Option v-for="item in tops" :value="item.id" :key="item">{{ item.name }}</Option>
                         </Select>
                     </Form-item>
                 </Col>
-                <Col span="8" :lg="8" :xs="12">
-                    <Form-item label="拼音" required>
-                        <Input v-model="data.py" placeholder="" disabled></Input>
+                <Col span="8" :lg="8" :sm="12" :xs="24">
+                    <Form-item label="二级分类" required>
+                        <Select v-model="data.categoryId" clearable placeholder="请选择">
+                            <Option :value="0">无</Option>
+                            <Option v-for="item in subs" :value="item.id" :key="item">{{ item.name }}</Option>
+                        </Select>
                     </Form-item>
                 </Col>
-                <Col span="8" :lg="8" :xs="12">
-                    <Form-item label="别名">
-                        <Input v-model="data.alias" placeholder=""></Input>
+                <Col span="8" :lg="8" :sm="12" :xs="24">
+                    <Form-item label="品牌" required>
+                        <Select v-model="data.bandId" clearable placeholder="请选择">
+                            <Option :value="0">无</Option>
+                            <Option v-for="item in brands" :value="item.id" :key="item">{{ item.name }}</Option>
+                        </Select>
                     </Form-item>
                 </Col>
                 <Col span="8" :lg="8" :xs="12">
@@ -33,8 +39,8 @@
                 <Col span="8" :lg="8" :sm="12" :xs="24">
                     <Form-item label="是否热门">
                         <Select v-model="data.hot" clearable placeholder="请选择">
-                            <Option value="1">热门</Option>
-                            <Option value="0">非热门</Option>
+                            <Option :value="1">热门</Option>
+                            <Option :value="0">非热门</Option>
                         </Select>
                     </Form-item>
                 </Col>
@@ -60,38 +66,50 @@
 </template>
 
 <script>
-import Pinyin from './../../assets/js/pinyin';
+import categoryService from './../../api/categoryService';
+import brandService from './../../api/brandService';
 
 export default {
-    props: {
-        tops: {
-            type: Array,
-            default: () => {
-                return [];
-            }
-        }
-    },
     data() {
         return {
+            tops: [],
+            subs: [],
+            brands: [],
             data: {
                 name: '',
-                hot: '0',
-                deleted: '0',
-                hidden: '0',
-                py: '',
-                pid: 0,
-                alias: '',
+                categoryRootId: 0,
+                categoryId: 0,
+                bandId: 0,
                 sort: 0,
-                desc: ''
+                hot: 0,
+                deleted: 0,
+                hidden: 0
             }
         };
     },
     methods: {
-        transferPinyin() {
-            this.data.py = Pinyin.getFullChars(this.data.name);
+        fetchSubs(id) {
+            categoryService.chosen(id).then(res => {
+                if (res.data.code === 1) {
+                    this.subs = res.data.data;
+                }
+            }); 
+        },
+        loadChosen() {
+            categoryService.chosen(0).then(res => {
+                if (res.data.code === 1) {
+                    this.tops = res.data.data;
+                }
+            });            
+            brandService.chosen().then(res => {
+                if (res.data.code === 1) {
+                    this.brands = res.data.data;
+                }
+            });
         }
     },
     created () {
+        this.loadChosen();
     }
 };
 </script>
