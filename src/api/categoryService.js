@@ -7,5 +7,5 @@ export default {
 
     delete: (params) => http.post('category/delete', params),
 
-    tops: () => http.post('category/tops')
+    chosen: (pid) => http.post('category/chosen', { pid })
 };

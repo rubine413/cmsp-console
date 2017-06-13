@@ -45,7 +45,7 @@ export default {
             params,
             cancelToken: new CancelToken(function executor(cancel) {
                 let reqURL = `${host}/${url}`;
-                dealReq(reqURL, cancel);
+                // dealReq(reqURL, cancel);
             })
         });
     },
@@ -56,7 +56,7 @@ export default {
             },
             cancelToken: new CancelToken(function executor(cancel) {
                 let reqURL = `${host}/${url}`;
-                dealReq(reqURL, cancel);
+                // dealReq(reqURL, cancel);
             })
         });
     },

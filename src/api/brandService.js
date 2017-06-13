@@ -13,5 +13,7 @@ export default {
 
     save: (params) => http.post('brand/save', params),
 
-    delete: (params) => http.post('brand/delete', params)
+    delete: (params) => http.post('brand/delete', params),
+    
+    chosen: () => http.post('brand/chosen')
 };
