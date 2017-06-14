@@ -25,7 +25,7 @@
                 </Col>
                 <Col span="8" :lg="8" :sm="12" :xs="24">
                     <Form-item label="品牌" required>
-                        <Select v-model="data.bandId" clearable placeholder="请选择">
+                        <Select v-model="data.brandId" clearable placeholder="请选择">
                             <Option :value="0">无</Option>
                             <Option v-for="item in brands" :value="item.id" :key="item">{{ item.name }}</Option>
                         </Select>
@@ -79,7 +79,7 @@ export default {
                 name: '',
                 categoryRootId: 0,
                 categoryId: 0,
-                bandId: 0,
+                brandId: 0,
                 sort: 0,
                 hot: 0,
                 deleted: 0,

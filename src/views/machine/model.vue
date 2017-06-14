@@ -117,7 +117,7 @@ export default {
                 width: 150
             }, {
                 title: '品牌',
-                key: 'brand',
+                key: 'brandName',
                 // fixed: 'left',
                 width: 100
             }, {
@@ -163,9 +163,9 @@ export default {
             }],
             filterOptions: {
                 name: '',
-                categoryRoot: 0,
-                category: 0,
-                brand: 0,
+                categoryRoot: null,
+                category: null,
+                brand: null,
                 hot: '',
                 hidden: 0,
                 deleted: 0,
@@ -211,7 +211,6 @@ export default {
         save(obj) {
             let params = this.$refs.dataForm.data;
             modelService.save(params).then(res => {
-                console.log(res);
                 if (res.data.code === 1) {
                     let data = res.data.data;
                     this.load();
