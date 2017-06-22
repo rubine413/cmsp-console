@@ -58,7 +58,7 @@
             </div>
         </div>
         <Modal v-model="showModal" :title="modalTitle" :width="modalWidth" :mask-closable="false" border @on-ok="save">
-            <Brand-Form ref="dataForm"></Brand-Form>
+            <Brand-Form ref="dataForm" v-model="dataRow"></Brand-Form>
         </Modal>
     </div>
 </template>
@@ -74,6 +74,7 @@ export default {
             dataList: [],
             dataCount: 0,
             dataPage: 1,
+            dataRow: null,
             dataColumns: [{
                 type: 'selection',
                 fixed: 'left',
@@ -121,6 +122,33 @@ export default {
                 key: 'createTime',
                 align: 'center',
                 width: 200
+            }, {
+                title: '操作',
+                key: 'action',
+                fixed: 'right',
+                align: 'center',
+                width: 120,
+                render: (h, params) => {
+                    return h('div', [
+                        h('Button', {
+                            props: {
+                                type: 'text',
+                                size: 'small'
+                            },
+                            on: {
+                                click: () => {
+                                    this.editRow(params);
+                                }
+                            }
+                        }, '编辑'),
+                        h('Button', {
+                            props: {
+                                type: 'text',
+                                size: 'small'
+                            }
+                        }, '删除')
+                    ]);
+                }
             }],
             filterOptions: {
                 hot: '',
@@ -152,6 +180,7 @@ export default {
             // console.log(Pinyin.getCamelChars('三一重工'));
         },
         add() {
+            this.dataRow = null;
             this.showModal = true;
         },
         save(obj) {
@@ -190,6 +219,11 @@ export default {
         handleReset () {
             console.log('reset');
             this.$refs.searchForm.resetFields();
+        },
+        editRow (params) {
+            this.dataRow = params.row;
+            this.showModal = true;
+            console.log(this.dataRow);
         }
     },
     created () {
@@ -197,26 +231,3 @@ export default {
     }
 };
 </script>
-
-
-
-<style lang="stylus" scoped>   
-@import '../../style/global.styl'
-
-.section-title
-    padding 10px
-    background #f5f5f5
-    margin 15px 0
-    p
-        font-weight bold
-        color #666
-        text-indent 12px
-        border-left 2px solid $primary-color 
-        
-    div + &
-        margin-top 60px 
-.section-desc
-    font-size 12px
-    text-align right
-
-</style>

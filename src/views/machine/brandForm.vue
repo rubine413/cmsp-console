@@ -48,8 +48,8 @@
                 <Col span="8" :lg="8" :sm="12" :xs="24">
                     <Form-item label="是否热门">
                         <Select v-model="data.hot" clearable placeholder="请选择">
-                            <Option value="1">热门</Option>
-                            <Option value="0">非热门</Option>
+                            <Option :value="1">热门</Option>
+                            <Option :value="0">非热门</Option>
                         </Select>
                     </Form-item>
                 </Col>
@@ -66,16 +66,16 @@
                 <Col span="8" :lg="8" :sm="12" :xs="24" v-if="data.id">
                     <Form-item label="是否隐藏">
                         <Select v-model="data.hidden" clearable placeholder="请选择">
-                            <Option value="0">不隐藏</Option>
-                            <Option value="1">隐藏</Option>
+                            <Option :value="0">不隐藏</Option>
+                            <Option :value="1">隐藏</Option>
                         </Select>
                     </Form-item>
                 </Col>
                 <Col span="8" :lg="8" :sm="12" :xs="24" v-if="data.id">
                     <Form-item label="是否已删除">
                         <Select v-model="data.deleted" clearable placeholder="请选择">
-                            <Option value="0">不删除</Option>
-                            <Option value="1">删除</Option>
+                            <Option :value="0">不删除</Option>
+                            <Option :value="1">删除</Option>
                         </Select>
                     </Form-item>
                 </Col>
@@ -90,13 +90,39 @@ import brandService from './../../api/brandService';
 import Pinyin from './../../assets/js/pinyin';
 
 export default {
+    props: {
+        value: {
+            type: Object,
+            default: null
+        }
+    },
+    watch: {
+        data: {
+            handler (newValue) {
+                this.$emit('input', newValue);
+            },
+            deep: true            
+        },
+        value: {
+            handler (newValue) {
+                this.data = newValue || this.initValue();
+            },
+            deep: true
+        }
+    },
     data() {
         return {
-            data: {
+            data: this.value || this.initValue()
+        };
+    },
+    methods: {
+        initValue() {
+            return {
+                id: null,
                 name: '',
-                hot: '0',
-                deleted: '0',
-                hidden: '0',
+                hot: 0,
+                deleted: 0,
+                hidden: 0,
                 py: '',
                 enName: '',
                 country: '',
@@ -106,22 +132,12 @@ export default {
                 address: '',
                 sort: 0,
                 desc: ''
-            }
-        };
-    },
-    methods: {
+            };
+        },
         transferPinyin() {
             this.data.py = Pinyin.getFullChars(this.data.name);
         }
     },
-    created () {
-    }
+    created () {}
 };
 </script>
-
-
-
-<style lang="stylus" scoped>   
-@import '../../style/global.styl'
-
-</style>
